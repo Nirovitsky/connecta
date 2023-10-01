@@ -22,6 +22,7 @@ import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
+    path('', include('authentication.urls')),
 ]
 
 
