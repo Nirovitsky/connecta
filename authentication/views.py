@@ -1,11 +1,11 @@
-from django.contrib.auth.models import User
-from django.contrib.auth.views import LoginView
-from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login
+from django.contrib.auth.views import LoginView
+from django.shortcuts import redirect
+from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.views.generic import FormView
-
+from .forms import CustomUserCreationForm
+from django.views.generic import TemplateView
 
 class CustomLoginView(LoginView):
     template_name = 'authentication/login.html'
@@ -13,27 +13,25 @@ class CustomLoginView(LoginView):
     redirect_authenticated_user = True
 
     def get_success_url(self):
-        return reverse_lazy('tasks')
-
+        return reverse_lazy('base')
 
 class RegisterPage(FormView):
     template_name = 'authentication/register.html'
-    form_class = UserCreationForm
+    form_class = CustomUserCreationForm
     redirect_authenticated_user = True
-    success_url = reverse_lazy('tasks')
+    success_url = reverse_lazy('base')
 
     def form_valid(self, form):
-        if all(not form.cleaned_data[field] for field in form.fields):
-            form.add_error(None, "Fields cannot be empty.")
-            return self.form_invalid(form)
-
-        # Rest of your existing code
         username = form.cleaned_data['username']
+        email = form.cleaned_data['email']
         password1 = form.cleaned_data['password1']
         password2 = form.cleaned_data['password2']
 
         if User.objects.filter(username=username).exists():
             form.add_error('username', 'This username is already taken.')
+
+        if User.objects.filter(email=email).exists():
+            form.add_error('email', 'This email is already registered.')
 
         if len(password1) < 8:
             form.add_error('password1', 'This password is too short. It must contain at least 8 characters.')
@@ -54,3 +52,10 @@ class RegisterPage(FormView):
             return redirect("tasks")
 
         return super().dispatch(request, *args, **kwargs)
+
+
+class BaseView(TemplateView):
+    template_name = 'base.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
