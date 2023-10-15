@@ -1,19 +1,18 @@
 from django.contrib.auth import login
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, LogoutView
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.views.generic import FormView
 from .forms import CustomUserCreationForm
 from django.views.generic import TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 class CustomLoginView(LoginView):
     template_name = 'authentication/login.html'
-    fields = '__all__'
     redirect_authenticated_user = True
-
-    def get_success_url(self):
-        return reverse_lazy('base')
+    success_url = reverse_lazy('base')
 
 class RegisterPage(FormView):
     template_name = 'authentication/register.html'
@@ -49,13 +48,24 @@ class RegisterPage(FormView):
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return redirect("tasks")
+            return redirect("base")
 
         return super().dispatch(request, *args, **kwargs)
 
 
-class BaseView(TemplateView):
+class BaseView(LoginRequiredMixin, TemplateView):
     template_name = 'base.html'
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().get(request, *args, **kwargs)
+        else:
+            return HttpResponse("You are not logged in. Redirect to login page.")
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
+
+
+class CustomLogoutView(LogoutView):
+    next_page = reverse_lazy('register')

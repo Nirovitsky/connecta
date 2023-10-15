@@ -131,3 +131,7 @@ COMPRESS_ROOT = BASE_DIR / 'static'
 COMPRESS_ENABLED = True
 
 STATICFILES_FINDERS = ('compressor.finders.CompressorFinder',)
+
+AUTH_USER_MODEL = 'auth.User'
+
+LOGIN_URL = 'login'
