@@ -5,9 +5,10 @@ from django.shortcuts import redirect
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.views.generic import FormView
-from .forms import CustomUserCreationForm
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from authentication.forms import CustomUserCreationForm
+
 
 class CustomLoginView(LoginView):
     template_name = 'authentication/login.html'
@@ -21,23 +22,6 @@ class RegisterPage(FormView):
     success_url = reverse_lazy('base')
 
     def form_valid(self, form):
-        username = form.cleaned_data['username']
-        email = form.cleaned_data['email']
-        password1 = form.cleaned_data['password1']
-        password2 = form.cleaned_data['password2']
-
-        if User.objects.filter(username=username).exists():
-            form.add_error('username', 'This username is already taken.')
-
-        if User.objects.filter(email=email).exists():
-            form.add_error('email', 'This email is already registered.')
-
-        if len(password1) < 8:
-            form.add_error('password1', 'This password is too short. It must contain at least 8 characters.')
-        if password1 != password2:
-            form.add_error('password1', 'Passwords do not match.')
-            form.add_error('password2', 'Passwords do not match.')
-
         if form.errors:
             return self.form_invalid(form)
 
@@ -55,7 +39,6 @@ class RegisterPage(FormView):
 
 class BaseView(LoginRequiredMixin, TemplateView):
     template_name = 'base.html'
-
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             return super().get(request, *args, **kwargs)
@@ -68,4 +51,4 @@ class BaseView(LoginRequiredMixin, TemplateView):
 
 
 class CustomLogoutView(LogoutView):
-    next_page = reverse_lazy('register')
+    next_page = reverse_lazy('login')

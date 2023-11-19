@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+
+  <ul class="space-y-4 m-20 text-center">
+    {% for post in object_list %}
+      <li class="border border-gray-200 rounded p-4 w-2/4 inline-block">
+        <div class="flex justify-between items-center mb-2">
+          <div>
+            <strong class="text-blue-600">{{ post.user.username }}</strong>
+            <span class="text-gray-500">{{ post.timestamp|date:"F d, Y H:i" }}</span>
+          </div>
+          {% if user.is_authenticated and user == post.user %}
+            <a href="{% url 'posts:post_delete' post.pk %}" class="text-red-500 hover:text-red-700">Delete</a>
+          {% endif %}
+        </div>
+        <p class="text-gray-700 text-left">{{ post.content }}</p>
+
+        {% if post.image %}
+          <img src="{{ post.image.url }}" alt="Post Image" class="mt-4" style="max-width: 100%; height: auto;">
+        {% endif %}
+      </li>
+    {% empty %}
+      <p class="text-gray-500 text-left">No posts available.</p>
+    {% endfor %}
+  </ul>
+<div class="flex mb-20">
+  <button type="submit" class="inline-flex items-center px-5 py-2.5 text-sm font-medium m-auto items-center justify-center text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800">
+    <a href="{% url 'posts:post_create' %}">Create a new post</a>
+  </button>
+</div>
+
+
+{% endblock %}

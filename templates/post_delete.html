@@ -1,10 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-</body>
-</html>
+{% block content %}
+  <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg m-20">
+    <form method="post">
+      {% csrf_token %}
+      <p class="text-black-500 text-lg font-semibold mb-4">Are you sure you want to delete this post?</p>
+      <button type="submit" class="bg-red-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-600">Delete</button>
+    </form>
+
+    <button type="submit" class="bg-blue-500 text-white font-semibold px-4 py-2 hover:bg-blue-600 rounded-lg mt-4">
+      <a href="{% url 'posts:post_list' %}">Cancel</a>
+    </button>
+  </div>
+{% endblock %}
