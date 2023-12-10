@@ -2,12 +2,12 @@ from django.contrib.auth import login
 from django.contrib.auth.views import LoginView, LogoutView
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.views.generic import FormView
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from authentication.forms import CustomUserCreationForm
+from userprofile.models import UserProfile
 
 
 class CustomLoginView(LoginView):
@@ -26,6 +26,10 @@ class RegisterPage(FormView):
             return self.form_invalid(form)
 
         user = form.save()
+
+        user_profile, created = UserProfile.objects.get_or_create(user=user)
+        user_profile.save()
+
         if user is not None:
             login(self.request, user)
         return super().form_valid(form)

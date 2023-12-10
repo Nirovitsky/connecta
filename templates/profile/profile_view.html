@@ -7,32 +7,58 @@
         <img class="object-cover object-top w-full cursor-pointer" src='https://images.unsplash.com/photo-1549880338-65ddcdfd017b?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE0NTg5fQ' alt='Mountain'>
     </div>
     <div class="mx-auto w-32 h-32 relative -mt-16 border-4 border-white rounded-full overflow-hidden">
-        <div class="mx-auto w-32 h-32 relative -mt-16 border-4 border-white rounded-full overflow-hidden">
-    {% if user.userprofile.profile_picture %}
-        <img src="{{ user.userprofile.profile_picture.url }}" alt="Profile Picture" class="object-cover object-top w-full">
-    {% else %}
-        <svg class="object-cover object-top w-full" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z"/>
-        </svg>
-    {% endif %}
-    </div>
-
+        <div class="mx-auto w-32 h-32 relative -mt-16 border-4 border-white rounded-full overflow-hidden absolute right-0.5" style="top: 60px;">
+            {% if user.userprofile.profile_picture %}
+                <img src="{{ user.userprofile.profile_picture.url }}" alt="Profile Picture" class="object-cover object-top w-full h-full">
+            {% else %}
+                <svg class="object-cover object-top w-full h-full" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z"/>
+                </svg>
+            {% endif %}
+        </div>
     </div>
     <div class="text-center mt-2 relative">
-        <a href="{% url 'profile_edit' username=user.username %}">
-            <svg class="absolute bottom-20 right-4 w-6 h-6 text-gray-800 dark:text-white cursor-pointer" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 18">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.109 17H1v-2a4 4 0 0 1 4-4h.87M10 4.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Zm7.95 2.55a2 2 0 0 1 0 2.829l-6.364 6.364-3.536.707.707-3.536 6.364-6.364a2 2 0 0 1 2.829 0Z"/>
-            </svg>
-        </a>
-        <h2 class="font-semibold">{{ user.username }}</h2>
+        {% if user == request.user %}
+            <a href="{% url 'profile_edit' username=user.username %}">
+                <svg class="absolute bottom-20 right-4 w-6 h-6 text-gray-800 dark:text-white cursor-pointer" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 18">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.109 17H1v-2a4 4 0 0 1 4-4h.87M10 4.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Zm7.95 2.55a2 2 0 0 1 0 2.829l-6.364 6.364-3.536.707.707-3.536 6.364-6.364a2 2 0 0 1 2.829 0Z"/>
+                </svg>
+            </a>
+        {% endif %}
+        <h2 class="font-semibold">@{{ user.username }}</h2>
         <p class="text-gray-500">{{ user.userprofile.bio }}</p>
     </div>
     <ul class="py-4 mt-2 text-gray-700 flex items-center justify-around">
-<!--        followers/followings-->
+        <li>
+            <a href="{% url 'follower_list' username=user.username %}">
+                <span class="font-semibold">{{ user.userprofile.followers.count }}</span>
+                <span class="text-gray-500">Followers</span>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'following_list' username=user.username %}">
+                <span class="font-semibold">{{ user.userprofile.followings.count }}</span>
+                <span class="text-gray-500">Following</span>
+            </a>
+        </li>
     </ul>
     <div class="p-4 border-t mx-8 mt-2">
-        <button class="w-1/2 block mx-auto rounded-full bg-gray-900 hover:shadow-lg font-semibold text-white px-6 py-2">Follow</button>
+        {% if request.user != user %}
+            <form method="post" action="{% url 'follow_toggle' username=user.username %}">
+                {% csrf_token %}
+                <button class="w-1/2 block mx-auto rounded-full {% if request.user in user.userprofile.followers.all %}bg-blue-500{% else %}bg-gray-900{% endif %} hover:shadow-lg font-semibold text-white px-6 py-2" type="submit">
+                    {% if request.user in user.userprofile.followers.all %}
+                        Following
+                    {% else %}
+                        Follow
+                    {% endif %}
+                </button>
+            </form>
+        {% endif %}
     </div>
+
+
 </div>
+
 
 {% endblock %}

@@ -1,33 +1,70 @@
 {% extends 'base.html' %}
 {% block content %}
 
-  <ul class="space-y-4 m-20 text-center">
-    {% for post in object_list %}
-      <li class="border border-gray-200 rounded p-4 w-2/4 inline-block">
-        <div class="flex justify-between items-center mb-2">
-          <div>
-            <strong class="text-blue-600">{{ post.user.username }}</strong>
-            <span class="text-gray-500">{{ post.timestamp|date:"F d, Y H:i" }}</span>
-          </div>
-          {% if user.is_authenticated and user == post.user %}
-            <a href="{% url 'posts:post_delete' post.pk %}" class="text-red-500 hover:text-red-700">Delete</a>
-          {% endif %}
-        </div>
-        <p class="text-gray-700 text-left">{{ post.content }}</p>
-
-        {% if post.image %}
-          <img src="{{ post.image.url }}" alt="Post Image" class="mt-4" style="max-width: 100%; height: auto;">
-        {% endif %}
-      </li>
-    {% empty %}
-      <p class="text-gray-500 text-left">No posts available.</p>
-    {% endfor %}
-  </ul>
 <div class="flex mb-20">
   <button type="submit" class="inline-flex items-center px-5 py-2.5 text-sm font-medium m-auto items-center justify-center text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800">
     <a href="{% url 'posts:post_create' %}">Create a new post</a>
   </button>
 </div>
 
+<!--Posts-->
+<ul class="space-y-4 m-20 text-center">
+  {% for post in object_list %}
+    <li class="border border-gray-200 rounded p-4 w-2/4 inline-block">
+      <div class="flex justify-between items-center mb-2">
+        <div class="flex items-center">
+          <a href="{% url 'profile_view' username=post.user.username %}" class="flex items-center">
+            {% if post.user.userprofile.profile_picture %}
+              <img src="{{ post.user.userprofile.profile_picture.url }}" alt="{{ post.user.username }}" class="w-10 h-10 rounded-full object-cover cursor-pointer">
+            {% else %}
+              <svg class="w-10 h-10 rounded-full object-cover cursor-pointer" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+              </svg>
+            {% endif %}
+            <strong class="text-blue-600 ml-4 cursor-pointer">@{{ post.user.username }}</strong>
+            <span class="text-gray-500 ml-3">{{ post.timestamp|date:"F d, Y H:i" }}</span>
+          </a>
+        </div>
+        {% if user.is_authenticated and user == post.user %}
+          <a href="{% url 'posts:post_delete' post.pk %}" class="text-red-500 hover:text-red-700">
+            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m13 7-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+            </svg>
+          </a>
+        {% endif %}
+      </div>
+      <p class="text-gray-700 text-left">{{ post.content }}</p>
+
+      {% if post.image %}
+        <img src="{{ post.image.url }}" alt="Post Image" class="mt-4" style="max-width: 100%; height: auto;">
+      {% endif %}
+
+      <!-- Likes -->
+      <div class="flex items-center mt-4">
+    <form method="post" action="{% url 'posts:toggle_like' post.id %}">
+        {% csrf_token %}
+        <button type="submit" class="flex text-gray-700 hover:text-blue-500 mr-2">
+            {% if post.id in liked_posts %}
+                <svg class="w-6 h-6 text-red-600 dark:text-red-600 mr-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="heart" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v-5.8c0 41.5 17.2 81.2 47.6 109.5z"></path></svg>
+            {% else %}
+                <svg class="w-6 h-6 text-red-600 dark:text-red-600 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 21 19">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4C5.5-1.5-1.5 5.5 4 11l7 7 7-7c5.458-5.458-1.542-12.458-7-7Z"/>
+                </svg>
+            {% endif %}
+
+            {{ post.likes.count }}
+        </button>
+    </form>
+          <button class="flex hover:text-blue-500">
+            <svg class="w-6 h-6 text-gray-300 dark:text-gray-400 ml-2 mr-2 cursor-pointer" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="comment" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M512 240c0 114.9-114.6 208-256 208c-37.1 0-72.3-6.4-104.1-17.9c-11.9 8.7-31.3 20.6-54.3 30.6C73.6 471.1 44.7 480 16 480c-6.5 0-12.3-3.9-14.8-9.9c-2.5-6-1.1-12.8 3.4-17.4l0 0 0 0 0 0 0 0 .3-.3c.3-.3 .7-.7 1.3-1.4c1.1-1.2 2.8-3.1 4.9-5.7c4.1-5 9.6-12.4 15.2-21.6c10-16.6 19.5-38.4 21.4-62.9C17.7 326.8 0 285.1 0 240C0 125.1 114.6 32 256 32s256 93.1 256 208z"></path></svg>
+            {{ post.comments.count }}
+          </button>
+</div>
+
+    </li>
+  {% empty %}
+    <p class="text-gray-500 text-left">No posts available.</p>
+  {% endfor %}
+</ul>
 
 {% endblock %}
