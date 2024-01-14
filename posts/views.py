@@ -5,6 +5,8 @@ from .forms import PostForm
 from .models import Post, Comment, Like
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
+from django.views.generic import DetailView
+from .forms import CommentForm
 
 
 class PostListView(ListView):
@@ -42,6 +44,16 @@ class PostCreateView(CreateView):
     def get_success_url(self):
         return reverse('posts:post_list')
 
+
+class PostDetailView(DetailView):
+    model = Post
+    template_name = 'post_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comments'] = Comment.objects.filter(post=self.object)
+        context['comment_form'] = CommentForm()
+        return context
 
 class PostDeleteView(DeleteView):
     model = Post
