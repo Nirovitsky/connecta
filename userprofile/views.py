@@ -8,9 +8,9 @@ from .forms import UserProfileForm
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.views.generic.list import ListView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-
-class UserProfileView(DetailView):
+class UserProfileView(LoginRequiredMixin, DetailView):
     model = UserProfile
     template_name = 'profile/profile_view.html'
     context_object_name = 'user_profile'
@@ -30,7 +30,7 @@ class UserProfileView(DetailView):
         return context
 
 
-class UserProfileEditView(UpdateView):
+class UserProfileEditView(LoginRequiredMixin, UpdateView):
     model = UserProfile
     form_class = UserProfileForm
     template_name = 'profile/profile_edit.html'
@@ -84,7 +84,7 @@ class FollowersListView(ListView):
         return user_profile.followers.all()
 
 
-class FollowingListView(ListView):
+class FollowingListView(LoginRequiredMixin, ListView):
     model = UserProfile
     template_name = 'following_list.html'
     context_object_name = 'following'
