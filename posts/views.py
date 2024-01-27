@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, CreateView, DeleteView
 from .forms import PostForm
@@ -9,7 +10,7 @@ from django.views.generic import DetailView
 from .forms import CommentForm
 
 
-class PostListView(ListView):
+class PostListView(LoginRequiredMixin, ListView):
     model = Post
     template_name = 'post_list.html'
     context_object_name = 'posts'
@@ -26,7 +27,7 @@ class PostListView(ListView):
 
         return context
 
-class PostCreateView(CreateView):
+class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     template_name = 'post_create.html'
     form_class = PostForm
@@ -45,7 +46,7 @@ class PostCreateView(CreateView):
         return reverse('posts:post_list')
 
 
-class PostDetailView(DetailView):
+class PostDetailView(LoginRequiredMixin, DetailView):
     model = Post
     template_name = 'post_detail.html'
 
@@ -55,7 +56,7 @@ class PostDetailView(DetailView):
         context['comment_form'] = CommentForm()
         return context
 
-class PostDeleteView(DeleteView):
+class PostDeleteView(LoginRequiredMixin, DeleteView):
     model = Post
     template_name = 'post_delete.html'
     success_url = reverse_lazy('posts:post_list')
