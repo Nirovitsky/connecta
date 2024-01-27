@@ -11,12 +11,12 @@ from userprofile.models import UserProfile
 
 
 class CustomLoginView(LoginView):
-    template_name = 'post_list.html'
+    template_name = 'authentication/login.html'
     redirect_authenticated_user = True
     success_url = reverse_lazy('posts')
 
 class RegisterPage(FormView):
-    template_name = 'post_list.html'
+    template_name = 'authentication/register.html'
     form_class = CustomUserCreationForm
     redirect_authenticated_user = True
     success_url = reverse_lazy('posts')
@@ -42,7 +42,7 @@ class RegisterPage(FormView):
 
 
 class BaseView(LoginRequiredMixin, TemplateView):
-    template_name = 'base.html'
+    template_name = 'post_list.html'
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             return super().get(request, *args, **kwargs)
