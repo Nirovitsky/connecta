@@ -5,6 +5,9 @@ name = "pypi"
 
 [packages]
 django = "*"
+whitenoise = {extras = ["brotli"], version = "*"}
+gunicorn = "*"
+uvicorn = "*"
 
 [dev-packages]
 
