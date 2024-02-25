@@ -73,7 +73,7 @@ def follow_toggle(request, username):
     return redirect('profile_view', username=username)
 
 
-class FollowersListView(ListView):
+class FollowersListView(LoginRequiredMixin, ListView):
     model = UserProfile
     template_name = 'followers_list.html'
     context_object_name = 'followers'
