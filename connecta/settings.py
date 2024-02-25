@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'core',
     'posts',
     'userprofile',
-    'compressor',
     'authentication',
 ]
 
