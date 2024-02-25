@@ -8,6 +8,7 @@ django = "*"
 whitenoise = {extras = ["brotli"], version = "*"}
 gunicorn = "*"
 uvicorn = "*"
+dj-database-url = "*"
 
 [dev-packages]
 
